@@ -10,7 +10,7 @@ services:
     volumes:
       - /server/data/nexus:/nexus-data
     ports:
-      - 8081:8081
+      - 8082:8081
     deploy:
       resources:
         limits:
