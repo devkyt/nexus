@@ -15,5 +15,5 @@ services:
       resources:
         limits:
           memory: 8000M
-          cpus: 1
+          cpus: '1'
     
