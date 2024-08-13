@@ -8,9 +8,9 @@ So they won't be communicate with official registries directly as it was before 
 ### Npm
 Save this config to .npmrc file in your user directory ("C:\Users\Dev\"):
 ```toml
-registry = https://nexus.org.com/repository/npm-group/
+registry = https://nexus.organization.com/repository/npm-group/
 
-email = dev@novotrend.de
+email = dev@organization.com
 
 always-auth = true
 strict-ssl = false
@@ -32,7 +32,7 @@ Create NuGet.Config file with following content:
     </config>
     <packageSources>
         <clear />
-        <add key="nexus"  value="https://nexus.org.com/repository/nuget-proxy/index.json" allowInsecureConnections="true" />
+        <add key="nexus"  value="https://nexus.organization.com/repository/nuget-proxy/index.json" allowInsecureConnections="true" />
     </packageSources>
     <packageSourceCredentials>
         <nexus>
