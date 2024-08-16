@@ -18,7 +18,7 @@ strict-ssl = false
 //nexus.novotrend.de/repository/npm-group/:_auth = username:password | base64
 ```
 
-Run ```npm install <package-name>`` in some project to check if everything is working.
+Run ```npm install <package-name>``` in some project to check if everything is working.
 
 
 ### NuGet
