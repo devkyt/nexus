@@ -53,4 +53,4 @@ If it's on the list, delete nuget.org from sources:
 dotnet nuget remove source nuget.org
 ```
 
-Run ```dotnet add package <package-name>`` in some project to check if everything is working.
+Run ```dotnet add package <package-name>``` in some project to check if everything is working.
