@@ -54,3 +54,41 @@ dotnet nuget remove source nuget.org
 ```
 
 Run ```dotnet add package <package-name>``` in some project to check if everything is working.
+
+## Reset Admin Password
+If you forget or lost an admin password, you can reset it via H2 console. 
+
+Go to $NEXUS_DATA/etc folder and add these lines to nexus.properties:
+```
+nexus.h2.httpListenerEnabled=true
+nexus.h2.httpListenerPort=1234
+```
+
+Restart container with 1234 port exposed:
+```yaml
+ports:
+    - 8082:8081
+    - 1234:1234 
+```
+
+Then open localhost:1234 in browser and connect to db:
+```
+Save Settings: Generic H2 (Embedded)
+Driver: org.h2.Driver
+JDBC URL: jdbc:h2:file:nexus
+username: <blank>
+password: <blank>
+```
+
+Reset password to default "admin123":
+```sql
+UPDATE security_user SET password='$shiro1$SHA-512$1024$NE+wqQq/TmjZMvfI7ENh/g==$V4yPw8T64UQ6GfJfxYq2hLsVrBY8D1v+bktfOxGdt4b/9BthpWPNUy/CBk6V9iA0nHpzYzJFWO8v/tZFtES8CA==', status='active' WHERE id='admin';
+```
+
+Update role mapping for admin: 
+```sql
+UPDATE user_role_mapping SET roles='["nx-admin"]' WHERE user_id = 'admin';
+UPDATE user_role_mapping SET user-lo='admin' WHERE user_id = 'admin';
+```
+
+After that close port in container, delete h2 lines from properties and restart Nexus to apply last changes.
