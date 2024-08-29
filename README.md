@@ -55,6 +55,24 @@ dotnet nuget remove source nuget.org
 
 Run ```dotnet add package <package-name>``` in some project to check if everything is working.
 
+### Docker
+
+## Raw Repo
+Pack content of the folder into the archive:
+```sh
+tar -acf build-29-08-2024.zi -C build *
+```
+
+Send to the Nexus raw repo:
+```sh
+curl -v --user admin:admin123 --upload-file .\build-29-08-2024.zip https://nexus.novotrend.de/repository/raw/
+```
+
+Upload from the the Nexus raw repo: 
+```sh
+curl -vL --user admin:admin123 -o build.zip  https://nexus.novotrend.de/repository/raw/build-29-08-2024.zip
+```
+
 ## Reset Admin Password
 If you forget or lost an admin password, you can reset it via H2 console. 
 
