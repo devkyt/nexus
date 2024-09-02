@@ -6,6 +6,7 @@ workflow:
 
 variables:
   NOMAD_JOB: "sonatype-nexus"
+  description: "Unique name of Nomad's job"
 
 
 stages:
