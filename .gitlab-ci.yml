@@ -1,0 +1,37 @@
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE != "web"
+      when: never 
+
+
+variables:
+  NOMAD_JOB: "sonatype-nexus"
+
+
+stages:
+  - deploy
+
+
+default:
+  image: devkyt/nomad:v0.1
+
+
+deploy:
+  stage: deploy
+  script:
+    - nomad job run -address=$NOMAD_HOST 
+                    -token=$NOMAD_TOKEN ./nomad-job.hcl
+
+
+deploy:status:
+  stage: deploy
+  script:
+  - sleep 45
+  - HEALTHY=0
+  - while [[ "${HEALTHY}" -lt 1 ]]
+    do
+      nomad job status -json -address=$NOMAD_HOST -token=$NOMAD_TOKEN $NOMAD_JOB > summary.json;
+      HEALTHY=$(cat summary.json | jq '.[0] | .Summary.Summary.razor.Healthy');
+      FAILED=$(cat summary.json | jq '.[0] | .Summary.Summary.razor.Failed');
+      if [[ "${FAILED}" -ne 0 ]]; then exit 1; fi;
+    done 
