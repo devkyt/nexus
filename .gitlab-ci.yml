@@ -38,3 +38,6 @@ deploy:status:
       FAILED=$(cat summary.json | jq '.[0] | .Summary.Summary.razor.Failed');
       if [[ "${FAILED}" -ne 0 ]]; then exit 1; fi;
     done 
+  needs:
+    - job: deploy
+      artifacts: false
