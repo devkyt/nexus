@@ -1,6 +1,6 @@
 
 # Nexus <!-- omit from toc -->
-Nexus is a single storage manager for all libs, artifacts and container images that you have in your work environment.
+Nexus is a single storage manager for all libs, artifacts and container images that you have in your work environment.\
 Just setup Nexus and save yourself from a headache where to store these endless Python/JS/C# packages and unused backup archives.
 
 Want to know more? Read the [docs](https://help.sonatype.com/en/sonatype-nexus-repository.html).
@@ -74,7 +74,7 @@ Npm repository requires "Npm Bearer Token Realm" is enabled and the user has a r
 
 #### Access from device
 Save this config to .npmrc file in your user directory ("C:\Users\Dev\"):
-```toml
+```conf
 registry = https://nexus.organization.com/repository/npm-group/
 
 email = dev@organization.com
