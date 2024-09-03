@@ -56,8 +56,7 @@ After that, to start using Sonatype Nexus as a repo, dependencies proxy and cach
 So they won't be communicate with official registries directly as it was before but instead will request all packages through Nexus server.
 
 ## Default scenario
-In the default scenario you will setup a several Nexus repo of the same type (let's say Npm) and then combine them all under one repostiry group.\
-Doing so you provide to developers just a single access point to all repos. As a result they are shine and happy because they don't have to deal with different package registries anymore.\
+In the default scenario you will setup a several Nexus repo of the same type (let's say Npm) and then combine them all under one repostiry group. Doing so you provide to developers just a single access point to all repos. As a result they are shine and happy because they don't have to deal with different package registries anymore.
 Instead they load and publish packages to the one endpoint.
 
 <img src="./img/picture.png" alt="nexus" width="800"/></br>
