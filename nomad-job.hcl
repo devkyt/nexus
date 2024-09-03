@@ -1,11 +1,23 @@
+variable "pool" {
+    type     = string
+    default  = "linux"
+}
+
+variable "node" {
+    type    = string
+    default = "dev-1"
+}
+
+
+
 job "sonatype-nexus" {
     datacenters = [ "dc1" ]
 
-    node_pool   = "linux"
+    node_pool   = "${var.pool}"
 
     constraint {
         attribute = "${attr.unique.hostname}"
-        value     = "nvboot"
+        value     = "${var.node}"
     }   
 
     group "nexus" {

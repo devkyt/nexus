@@ -1,4 +1,10 @@
+
 # Nexus <!-- omit from toc -->
+Nexus is a single storage manager for all libs, artifacts and container images that you have in your work environment.
+Just setup Nexus and save yourself from a headache where to store these endless Python/JS/C# packages and unused backup archives.
+
+Want to know more? Read the [docs](https://help.sonatype.com/en/sonatype-nexus-repository.html).
+
 
 ## Table of Contents <!-- omit from toc -->
 - [Deploy](#deploy)
@@ -18,20 +24,24 @@
         - [Auth](#auth-3)
         - [Access from device](#access-from-device-3)
 - [Administration](#administration)
-    - [Reverse proxy]()
     - [Reset admin passowrd](#reset-admin-password)
     - [Backup](#backup)
 
 
 ## Deploy
+You can run Nexus on server via compose file from this repo:
+```sh
+docker compose -f path/to/repo/compose.yaml up -d 
+```
 
+Or using Nomad's job:
+```sh
+nomad job run --address=http://ip:4646 --token=token path/to/repo/nomad-job.hcl
+```
 
 ## Setup Repos
-To start using Sonatype Nexus as a dependencies proxy and cache storage you first need to point package managers to it. 
-So they won't be communicate with official registries directly as it was before but instead will request all packages through Nexus server.
-
 ### Common config
-These a common steps required to setup a repo on Nexus instance:
+These common steps required to setup a repo on Nexus instance:
 - Go to server administration page -> Blob storage
 - Create a blob storage for a future repo
 - Switch to the "Repositories" tab and press "Create repository"
@@ -42,15 +52,24 @@ These a common steps required to setup a repo on Nexus instance:
 - Switch to the "Users" and add a new user with the role created before 
 - Check if user can auth to repo and perform push/pull requests
 
+After that, to start using Sonatype Nexus as a repo, dependencies proxy and cache storage you need to point package managers to it. 
+So they won't be communicate with official registries directly as it was before but instead will request all packages through Nexus server.
+
+## Default scenario
+In the default scenario you will setup a several Nexus repo of the same type (let's say Npm) and then combine them all under one repostiry group.\
+Doing so you provide to developers just a single access point to all repos. As a result they are shine and happy because they don't have to deal with different package registries anymore.\
+Instead they load and publish packages to the one endpoint.
+
+<img src="./img/picture.png" alt="nexus" width="800"/></br>
 
 ### Npm
 #### Auth
 Npm repository requires "Npm Bearer Token Realm" is enabled and the user has a role with next privileges:
 ```
-  nx-repository-view-docker-repo-name-add
-  nx-repository-view-docker-repo-name-browse
-  nx-repository-view-docker-repo-name-read
-  nx-repository-view-docker-repo-name-edit
+  nx-repository-view-npm-repo-name-add
+  nx-repository-view-npm-repo-name-browse
+  nx-repository-view-npm-repo-name-read
+  nx-repository-view-npm-repo-name-edit
 ```
 
 #### Access from device
@@ -63,7 +82,7 @@ email = dev@organization.com
 always-auth = true
 strict-ssl = false
 
-//nexus.novotrend.de/repository/npm-group/:_auth = username:password | base64
+//nexus.organization.com/repository/npm-group/:_auth = username:password | base64
 ```
 
 Run ```npm install <package-name>``` in some project to check if everything is working.
@@ -73,10 +92,10 @@ Run ```npm install <package-name>``` in some project to check if everything is w
 #### Auth
 NuGet repository requires "NuGet API-Key Realm" is enabled and the user has a role with next privileges:
 ```
-  nx-repository-view-docker-repo-name-add
-  nx-repository-view-docker-repo-name-browse
-  nx-repository-view-docker-repo-name-read
-  nx-repository-view-docker-repo-name-edit
+  nx-repository-view-nuget-repo-name-add
+  nx-repository-view-nuget-repo-name-browse
+  nx-repository-view-nuget-repo-name-read
+  nx-repository-view-nuget-repo-name-edit
 ```
 
 #### Access from device
@@ -115,6 +134,72 @@ Run ```dotnet add package <package-name>``` in some project to check if everythi
 
 ### Docker
 #### Reverse proxy
+There is two ways to setup docker repo under the reverse proxy.
+
+Under separate domain:
+```conf
+http {
+
+    upstream nexus_server {
+        server ip:8081 max_fails=3 fail_timeout=10s;
+    }
+
+    server {
+        listen 443                 ssl http2;
+
+        server_name                registry.organization.com;
+        
+        client_max_body_size       1000M;
+
+        location /v2 {
+            proxy_pass             http://nexus_server/repository/docker-group/$request_uri;
+            include                /etc/nginx/proxy.headers.conf;
+
+        }
+    }
+
+    server {
+        listen 443                 ssl http2;
+
+        server_name                nexus.organization.de;
+
+        client_max_body_size       500M;
+        
+        location / {
+            proxy_pass             http://nexus_server;
+            include                /etc/nginx/proxy.headers.conf;
+        }
+    }
+}
+```
+
+Under default Nexus domain:
+```conf
+http {
+    upstream nexus_server {
+        server ip:8081 max_fails=3 fail_timeout=10s;
+    }
+
+    server {
+        listen 443                 ssl http2;
+
+        server_name                nexus.organization.de;
+
+        client_max_body_size       500M;
+        
+        location / {
+            proxy_pass             http://nexus_server;
+            include                /etc/nginx/proxy.headers.conf;
+        }
+
+        location /v2 {
+            proxy_pass             http://nexus_server/repository/docker-group/$request_uri;
+            include                /etc/nginx/proxy.headers.conf;
+        }
+    }
+}
+```
+
 
 
 #### Auth
@@ -156,12 +241,12 @@ tar -acf build-29-08-2024.zi -C build *
 
 Send to the Nexus raw repo:
 ```sh
-curl -v --user <user>:<password> --upload-file .\build-29-08-2024.zip https://nexus.novotrend.de/repository/raw/
+curl -v --user <user>:<password> --upload-file .\build-29-08-2024.zip https://nexus.organization.de/repository/raw/
 ```
 
 Upload from the the Nexus raw repo: 
 ```sh
-curl -vL --user <user>:<password> -o build.zip  https://nexus.novotrend.de/repository/raw/build-29-08-2024.zip
+curl -vL --user <user>:<password> -o build.zip  https://nexus.organization.de/repository/raw/build-29-08-2024.zip
 ```
 
 ## Administration
