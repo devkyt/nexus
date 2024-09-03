@@ -10,8 +10,7 @@ services:
     volumes:
       - ./data:/nexus-data
     ports:
-      - 8082:8081
-      - 5000:5000 # for container registry
+      - 8081:8081
     deploy:
       resources:
         limits:

@@ -23,11 +23,6 @@ job "sonatype-nexus" {
                 static = 9001 
                 to = 8081 
             }
-
-            port "registry" { 
-                static = 5050  
-                to = 5000 
-            }
         }
 
         task "server" {
@@ -39,8 +34,9 @@ job "sonatype-nexus" {
                 ports = [ "http", "registry" ]
 
                 labels {
-                    app = "nexus"
-                    env = "prod"
+                    group = "infra"
+                    app   = "nexus"
+                    env   = "prod"
                 }
             }
 
